@@ -47,7 +47,7 @@ const startEditor = async () => {
     });
 
     // the configuration does not contain any text content
-    const appConfig = createLangiumGlobalConfig({
+    const appConfig = await createLangiumGlobalConfig({
         languageServerId: 'first',
         codeContent: {
             text,

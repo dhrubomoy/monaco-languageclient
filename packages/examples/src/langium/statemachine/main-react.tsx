@@ -20,7 +20,7 @@ export const runStatemachineReact = async (noControls: boolean) => {
     reader.listen((message) => {
         console.log('Received message from worker:', message);
     });
-    const appConfig = createLangiumGlobalConfig({
+    const appConfig = await createLangiumGlobalConfig({
         languageServerId: 'react',
         codeContent: {
             text,
@@ -31,6 +31,7 @@ export const runStatemachineReact = async (noControls: boolean) => {
         htmlContainer: 'ReactPlaceholder'
     });
     const root = ReactDOM.createRoot(document.getElementById('react-root')!);
+    
     const App = () => {
 
         const [testState, setTestState] = useState<string>('');
