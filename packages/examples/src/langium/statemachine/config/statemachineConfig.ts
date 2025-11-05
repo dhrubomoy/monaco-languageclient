@@ -11,7 +11,7 @@ import { MessageTransports } from 'vscode-languageclient';
 import { createDefaultLocaleConfiguration } from 'monaco-languageclient/vscodeApiLocales';
 import type { MonacoVscodeApiConfig } from 'monaco-languageclient/vscodeApiWrapper';
 import type { LanguageClientConfig } from 'monaco-languageclient/lcwrapper';
-import { configureDefaultWorkerFactory } from 'monaco-languageclient/workerFactory';
+import { useWorkerFactory } from 'monaco-languageclient/workerFactory';
 import type { CodeContent, EditorAppConfig } from 'monaco-languageclient/editorApp';
 
 // cannot be imported with assert as json contains comments
@@ -115,7 +115,28 @@ export const createLangiumGlobalConfig = (params: {
             ...getLifecycleServiceOverride(),
             ...getLocalizationServiceOverride(createDefaultLocaleConfiguration()),
         },
-        monacoWorkerFactory: configureDefaultWorkerFactory,
+        // monacoWorkerFactory: configureDefaultWorkerFactory,
+        monacoWorkerFactory: (logger) => {
+            useWorkerFactory({
+                workerLoaders: {
+                // if you import monaco api as 'monaco-editor': monaco-editor/esm/vs/editor/editor.worker.js
+                    TextEditorWorker: () => new Worker(
+                        new URL('../../../assets/monaco-workers/editor.js', import.meta.url),
+                        { type: 'module' }
+                    ),
+                    TextMateWorker: () => new Worker(
+                        new URL('../../../assets/monaco-workers/textmate.js', import.meta.url),
+                        { type: 'module' }
+                    ),
+                    // these are other possible workers not configured by default
+                    OutputLinkDetectionWorker: undefined,
+                    LanguageDetectionWorker: undefined,
+                    NotebookEditorWorker: undefined,
+                    LocalFileSearchWorker: undefined
+                },
+                logger
+            });
+        },
         userConfiguration: {
             json: JSON.stringify({
                 'workbench.colorTheme': MY_LIGHT_THEME_ID,

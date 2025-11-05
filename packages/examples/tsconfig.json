@@ -8,5 +8,5 @@
   "include": [
     "src/**/*",
     "test/**/*"
-  ]
+, "bundle-monaco-workers.js"  ]
 }
