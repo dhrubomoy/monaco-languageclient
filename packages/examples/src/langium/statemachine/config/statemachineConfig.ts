@@ -96,6 +96,27 @@ export const createLangiumGlobalConfig = (params: {
     const editorAppConfig: EditorAppConfig = {
         codeResources: {
             modified: params.codeContent
+        },
+        languageDef: {
+            theme: {
+                name: 'statemachine-theme',
+                data: {
+                    base: 'vs-dark',
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: 'FF0000', fontStyle: 'bold' },
+                        { token: 'string', foreground: '00FF00' },
+                        { token: 'number', foreground: '0000FF' }
+                    ],
+                    colors: {}
+                }
+            },
+            languageExtensionConfig: {
+                id: 'statemachine',
+                extensions: ['.statemachine'],
+                aliases: ['statemachine', 'Statemachine']
+            }
+
         }
     };
 
