@@ -19,6 +19,61 @@ import statemachineLanguageConfig from './language-configuration.json?raw';
 import responseStatemachineTm from '../syntaxes/statemachine.tmLanguage.json?raw';
 import type { ExampleAppConfig } from '../../../common/client/utils.js';
 
+const MyTokenColors = {
+    string: { light: '#44751d', dark: '#44751d' },
+    escape: { light: '#44751d', dark: '#44751d' },
+    keyword: { light: '#6a8fde', dark: '#6a8fde' },
+    comment: { light: '#808080', dark: '#808080' },
+    field: { light: '#CC9966', dark: '#CC9966' },
+    table: { light: '#8e477d', dark: '#8e477d' },
+    variable: { light: '#CC99CC', dark: '#CC99CC' },
+    normalText: { light: '#000000', dark: '#ffffff' },
+};
+
+const getThemeId = (type: 'light' | 'dark') => `my-script-${type}-theme`;
+
+const getTheme = (type: 'light' | 'dark') => {
+    return {
+        id: getThemeId(type),
+        name: `My script ${type} theme`,
+        type,
+        colors: {},
+        tokenColors: [
+            {
+                scope: [
+                    'keyword.control.statemachine',
+                ],
+                settings: { foreground: MyTokenColors.string[type] },
+            },
+            {
+                scope: 'keyword.control.statemachine',
+                settings: { foreground: MyTokenColors.keyword[type] },
+            },
+            {
+                scope: [
+                    'comment.block.statemachine',
+                    'comment.line.statemachine',
+                ],
+                settings: { foreground: MyTokenColors.comment[type] },
+            },
+        ],
+
+        semanticHighlighting: true,
+        semanticTokenColors: {
+            property: MyTokenColors.field[type],
+            namespace: MyTokenColors.table[type],
+            variable: MyTokenColors.variable[type],
+            struct: MyTokenColors.normalText[type],
+        },
+    };
+};
+
+export const MY_DARK_THEME_ID = getThemeId('dark');
+export const MY_LIGHT_THEME_ID = getThemeId('light');
+export const MyLightTheme = getTheme('light');
+export const MyDarkTheme = getTheme('dark');
+
+
 export const createLangiumGlobalConfig = (params: {
     languageServerId: string,
     codeContent: CodeContent,
@@ -30,6 +85,8 @@ export const createLangiumGlobalConfig = (params: {
     const extensionFilesOrContents = new Map<string, string | URL>();
     extensionFilesOrContents.set(`/${params.languageServerId}-statemachine-configuration.json`, statemachineLanguageConfig);
     extensionFilesOrContents.set(`/${params.languageServerId}-statemachine-grammar.json`, responseStatemachineTm);
+    extensionFilesOrContents.set(`./${params.languageServerId}-${MY_LIGHT_THEME_ID}.json`, JSON.stringify(MyLightTheme, null, 2));
+    extensionFilesOrContents.set(`./${params.languageServerId}-${MY_DARK_THEME_ID}.json`, JSON.stringify(MyDarkTheme, null, 2));
 
     const languageClientConfig: LanguageClientConfig = {
         languageId: 'statemachine',
@@ -61,10 +118,10 @@ export const createLangiumGlobalConfig = (params: {
         monacoWorkerFactory: configureDefaultWorkerFactory,
         userConfiguration: {
             json: JSON.stringify({
-                'workbench.colorTheme': 'Default Dark Modern',
+                'workbench.colorTheme': MY_LIGHT_THEME_ID,
                 'editor.guides.bracketPairsHorizontal': 'active',
                 'editor.wordBasedSuggestions': 'off',
-                'editor.experimental.asyncTokenization': true
+                'editor.experimental.asyncTokenization': true,
             })
         },
         extensions: [{
@@ -86,7 +143,21 @@ export const createLangiumGlobalConfig = (params: {
                         language: 'statemachine',
                         scopeName: 'source.statemachine',
                         path: `./${params.languageServerId}-statemachine-grammar.json`
-                    }]
+                    }],
+                    themes: [
+                        {
+                            id: MY_LIGHT_THEME_ID,
+                            label: MyLightTheme.name,
+                            uiTheme: 'vs',
+                            path: `./${params.languageServerId}-${MY_LIGHT_THEME_ID}.json`,
+                        },
+                        {
+                            id: MY_DARK_THEME_ID,
+                            label: MyDarkTheme.name,
+                            uiTheme: 'vs-dark',
+                            path: `./${params.languageServerId}-${MY_DARK_THEME_ID}.json`,
+                        },
+                    ],
                 }
             },
             filesOrContents: extensionFilesOrContents
