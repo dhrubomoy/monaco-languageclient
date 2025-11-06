@@ -8,11 +8,11 @@ import { useWorkerFactory, type WorkerLoader } from 'monaco-languageclient/worke
 
 export const defineDefaultWorkerLoaders: () => Record<string, WorkerLoader> = () => {
     const defaultTextEditorWorker = () => new Worker(
-        new URL('../../../examples/src/assets/monaco-workers/editor.js', import.meta.url),
+        new URL('@codingame/monaco-vscode-editor-api/esm/vs/editor/editor.worker.js', import.meta.url),
         { type: 'module' }
     );
     const defaultTextMateWorker = () => new Worker(
-        new URL('../../../examples/src/assets/monaco-workers/textmate.js', import.meta.url),
+        new URL('@codingame/monaco-vscode-textmate-service-override/worker', import.meta.url),
         { type: 'module' }
     );
 
