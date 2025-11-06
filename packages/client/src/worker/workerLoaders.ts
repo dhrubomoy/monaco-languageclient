@@ -6,34 +6,14 @@
 import type { Logger } from 'monaco-languageclient/common';
 import { useWorkerFactory, type WorkerLoader } from 'monaco-languageclient/workerFactory';
 
-const createWorker = async (workerUrl: string, workerName: string) => {
-    // const workerUrl = new URL(file, import.meta.url).href;
-    const response = await fetch(workerUrl);
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch worker: ${response.statusText}`);
-    }
-
-    const workerCode = await response.text();
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
-    const blobUrl = URL.createObjectURL(blob);
-
-    const worker = new Worker(blobUrl, {
-        type: 'module',
-        name: workerName,
-    });
-
-    return worker;
-};
-
 export const defineDefaultWorkerLoaders: () => Record<string, WorkerLoader> = () => {
-    const defaultTextEditorWorker = () => createWorker(
-        new URL('../../../examples/src/assets/monaco-workers/editor.js', import.meta.url).href,
-        'TextEditorWorker'
+    const defaultTextEditorWorker = () => new Worker(
+        new URL('../../../examples/src/assets/monaco-workers/editor.js', import.meta.url),
+        { type: 'module' }
     );
-    const defaultTextMateWorker = () => createWorker(
-        new URL('../../../examples/src/assets/monaco-workers/textmate.js', import.meta.url).href,
-        'TextMateWorker'
+    const defaultTextMateWorker = () => new Worker(
+        new URL('../../../examples/src/assets/monaco-workers/textmate.js', import.meta.url),
+        { type: 'module' }
     );
 
     return {
