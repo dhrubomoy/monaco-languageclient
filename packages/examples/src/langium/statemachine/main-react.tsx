@@ -48,6 +48,21 @@ export const runStatemachineReact = async (noControls: boolean) => {
                         editorAppConfig={appConfig.editorAppConfig}
                         languageClientConfig={appConfig.languageClientConfig}
                         onTextChanged={onTextChanged}
+                        onEditorStartDone={(editorApp) => {
+                            if (editorApp) {
+                                const standaloneEditor = editorApp.getEditor();
+                                if (standaloneEditor) {
+                                    setTimeout(() => {
+                                        const model = standaloneEditor.getModel() as unknown as {
+                                            tokenization: {
+                                                forceTokenization: () => void;
+                                            };
+                                        };
+                                        model.tokenization.forceTokenization();
+                                    }, 500);
+                                }
+                            }
+                        }}
                     />
                     <b>Debug:</b><br />{testState}
                 </div>
